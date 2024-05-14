@@ -1,1 +1,6 @@
+# object files
 *.o
+
+
+# executable
+smfl-app

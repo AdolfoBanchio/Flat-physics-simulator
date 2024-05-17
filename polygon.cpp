@@ -12,7 +12,6 @@ Polygon::Polygon(const std::vector<sf::Vector2f>& _corners,
   mCorners = _corners;
   mColor = _color;
   material = _material;
-  calculateCentroid(); //calculates the center of the polygon and recenters the vectors
 
   velocity = sf::Vector2f(0.0f, 0.0f);
   angularVelocity = 0.0f;
@@ -27,30 +26,43 @@ Polygon::Polygon(const std::vector<sf::Vector2f>& _corners,
 }
 
 /* 
-It calculates the centeroid of the polygon according to the coordinates of the corners.
+It calculates the centroid of the polygon according to the coordinates of the corners.
 
-Recenter the corners of the polygon to the center of the polygon.
-
-Saves the centroid in the member : position
-*/
-void Polygon::calculateCentroid(){
+Also calculates the mass of the polygon according to the density of the material.
+and the inertia of the polygon.
+ */
+void Polygon::computeMass() {
   position = sf::Vector2f(0, 0);
   float signedArea = 0.0f;
-  // calculate the signed area
+  inertia = 0.0f;
+
+  // calculate the signed area, center and inertia
   for (size_t i = 0; i < mCorners.size(); ++i) {
     sf::Vector2f current = mCorners[i];
     sf::Vector2f next = mCorners[(i + 1) % mCorners.size()];
+ 
     float crossProduct = current.x * next.y - next.x * current.y;
     signedArea += crossProduct;
     position += (current + next) * crossProduct;
+
+    float x2 = current.x * current.x + next.x * current.x + next.x * next.x;
+    float y2 = current.y * current.y + next.y * current.y + next.y * next.y;
+    inertia = crossProduct * (x2 + y2);
   }
   signedArea *= 0.5f;
-  position /= 6.0f * signedArea;
+  position /= (6.0f * signedArea);
 
-  // recenter the corners
-  /* for (size_t i = 0; i < mCorners.size(); ++i) {
-    mCorners[i] -= position;
-  } */
+  // calculate the mass
+  mass = material.density * signedArea;
+  inv_mass = (mass) ? 1.0f / mass : 0.0f;
+
+  // calculate the inertia
+  inertia = std::abs(inertia) / (6.0f * signedArea);  
+  inv_inertia = (inertia) ? 1.0f / inertia : 0.0f;
+
+  std::cout << "Area: " << signedArea << "\n";
+  std::cout << "Mass: " << mass << "\n";
+  std::cout << "Inertia: " << inertia << "\n";
 }
 
 
@@ -88,6 +100,7 @@ void Polygon::Rotate(float angle) {
     mCorners[i].x = p.x * c - p.y * s + position.x;
     mCorners[i].y = p.x * s + p.y * c + position.y;
   }
+  calculateNormals();
 }
 
 void Polygon::setPosition(sf::Vector2f pos) {

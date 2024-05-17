@@ -46,24 +46,18 @@ public:
     // Set position of the polygon
     void setPosition(sf::Vector2f _position);
 
-    // override the render function of shape
-    void render(sf::RenderWindow& window);
-    
-    // change color
-    void setColor(sf::Color _color);
+    void computeMass();
 
-    // Render the normals of the polygon
+    void render(sf::RenderWindow& window);
     void renderNormals(sf::RenderWindow& window);
 
+    void setColor(sf::Color _color);
     // Get the type of the shape from the enum class ShapeType
     type getType() override;
 
 private:
     // Function to calculate normals 
     void calculateNormals();
-
-    // Function to calculate the center of the polygon
-    void calculateCentroid(); // the centroid will be the position of the polygon.
 };
 
 #endif

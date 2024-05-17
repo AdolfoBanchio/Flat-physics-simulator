@@ -12,16 +12,25 @@ I will use SFML library to draw the shapes and simulate the physics.
 #include <cmath>
 #include "polygon.h"
 #include "collision.h"
- 
+ const float PI = 3.14159265358979323846f;
+
+std::vector<sf::Vector2f> createRegularPentagon(float sideLength, sf::Vector2f center) {
+    std::vector<sf::Vector2f> vertices;
+    float R = sideLength / (2 * sin(PI / 5)); // Radius of the circumscribed circle
+
+    for (int i = 0; i < 5; ++i) {
+        float theta = 2 * PI * i / 5;
+        float x = R * cos(theta) + center.x;
+        float y = R * sin(theta) + center.y;
+        vertices.push_back(sf::Vector2f(x, y));
+    }
+
+    return vertices;
+}
 // First star creating the main function and creating some windows and shapes
-std::vector<sf::Vector2f> corners = {
-    sf::Vector2f(200, 50),
-    sf::Vector2f(200, 100),
-    sf::Vector2f(250, 150),
-    sf::Vector2f(200, 200),
-    sf::Vector2f(100, 200)
-};
+std::vector<sf::Vector2f> corners = createRegularPentagon(1 * 37.7953f, sf::Vector2f(50, 50));
 Polygon polygon(corners, sf::Color::Red, mat_rock);
+
 // create a triangle
 std::vector<sf::Vector2f> corners2 = {
     sf::Vector2f(300, 300),
@@ -29,7 +38,8 @@ std::vector<sf::Vector2f> corners2 = {
     sf::Vector2f(350, 400)
 };
 Polygon polygon2(corners2, sf::Color::Green);
-// see if the polygons are colliding
+
+
 //create a Mainfold with the shapes
 Mainfold coll = Mainfold(&polygon, &polygon2);
 
@@ -69,7 +79,7 @@ void updatePositions(Mainfold&coll,sf::RenderWindow& window){
             
             sf::Vector2f newpos = polygon->position + sf::Vector2f(1, 1); 
             polygon->Rotate(0.01);
-            //polygon->setPosition(newpos);
+            polygon->setPosition(newpos);
         }
 }
 

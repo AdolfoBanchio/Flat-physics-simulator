@@ -15,13 +15,13 @@ I will use SFML library to draw the shapes and simulate the physics.
  
 // First star creating the main function and creating some windows and shapes
 std::vector<sf::Vector2f> corners = {
-    sf::Vector2f(100, 100),
+    sf::Vector2f(200, 50),
     sf::Vector2f(200, 100),
     sf::Vector2f(250, 150),
     sf::Vector2f(200, 200),
     sf::Vector2f(100, 200)
 };
-Polygon polygon(corners);
+Polygon polygon(corners, sf::Color::Red, mat_rock);
 // create a triangle
 std::vector<sf::Vector2f> corners2 = {
     sf::Vector2f(300, 300),
@@ -33,7 +33,7 @@ Polygon polygon2(corners2, sf::Color::Green);
 //create a Mainfold with the shapes
 Mainfold coll = Mainfold(&polygon, &polygon2);
 
-const float fps = 5.0f;
+const float fps = 24.0f;
 const float dt = 1.0f / fps;
 sf::Time dtTime = sf::seconds(dt);
 sf::Time accumulatorTime = sf::seconds(0.0f);
@@ -47,9 +47,9 @@ void updatePositions(Mainfold&coll,sf::RenderWindow& window){
     if (coll.isColliding) {
             polygon->setColor(sf::Color::Blue);
             sf::VertexArray normalLine(sf::LinesStrip, 2);
-            normalLine[0].position = polygon->mCenter;
+            normalLine[0].position = polygon->position;
             normalLine[0].color = sf::Color::Red; // Set normal line start color (black)
-            normalLine[1].position = polygon->mCenter + 1000.0f * coll.normal; // Extend normal line by 20 units
+            normalLine[1].position = polygon->position + 1000.0f * coll.normal; // Extend normal line by 20 units
             normalLine[1].color = sf::Color::Red; // Set normal line end color (red)
             // print in the stout the normal of the collision
             window.draw(normalLine);
@@ -63,10 +63,13 @@ void updatePositions(Mainfold&coll,sf::RenderWindow& window){
         //then scale it down to the original value
         if(cond) {
             //polygon.Scale(factor);
-            polygon2->Scale(factor);
+            //polygon2->Scale(factor);
             factor += 0.01;
-            //polygon2.Translate(sf::Vector2f(0, -1));
-            polygon->Translate(sf::Vector2f(0.3, 1));
+            polygon2->Rotate(0.01);
+            
+            sf::Vector2f newpos = polygon->position + sf::Vector2f(1, 1); 
+            polygon->Rotate(0.01);
+            //polygon->setPosition(newpos);
         }
 }
 

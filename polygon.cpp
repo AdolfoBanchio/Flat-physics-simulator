@@ -5,18 +5,54 @@ This is the definition of the Polygon struct.
 #include "polygon.h"
 #include <cmath>
 
-Polygon::Polygon(const std::vector<sf::Vector2f>& _corners, sf::Color _color) {
+Polygon::Polygon(const std::vector<sf::Vector2f>& _corners, 
+                sf::Color _color,
+                Material _material,
+                float _rotation){
   mCorners = _corners;
   mColor = _color;
-  // calculate the center of the polygon using the corners
-  mCenter = sf::Vector2f(0.0f, 0.0f);
-  for (size_t i = 0; i < mCorners.size(); ++i) {
-    mCenter += mCorners[i];
-  }
-  mCenter /= static_cast<float>(mCorners.size());
+  material = _material;
+  calculateCentroid(); //calculates the center of the polygon and recenters the vectors
 
+  velocity = sf::Vector2f(0.0f, 0.0f);
+  angularVelocity = 0.0f;
+  force = sf::Vector2f(0.0f, 0.0f);
+  torque = 0.0f;
+
+  rotation = _rotation;
+
+  computeMass();
+  // calculate the center of the polygon using the corners
   calculateNormals(); // Call the private function to calculate normals
 }
+
+/* 
+It calculates the centeroid of the polygon according to the coordinates of the corners.
+
+Recenter the corners of the polygon to the center of the polygon.
+
+Saves the centroid in the member : position
+*/
+void Polygon::calculateCentroid(){
+  position = sf::Vector2f(0, 0);
+  float signedArea = 0.0f;
+  // calculate the signed area
+  for (size_t i = 0; i < mCorners.size(); ++i) {
+    sf::Vector2f current = mCorners[i];
+    sf::Vector2f next = mCorners[(i + 1) % mCorners.size()];
+    float crossProduct = current.x * next.y - next.x * current.y;
+    signedArea += crossProduct;
+    position += (current + next) * crossProduct;
+  }
+  signedArea *= 0.5f;
+  position /= 6.0f * signedArea;
+
+  // recenter the corners
+  /* for (size_t i = 0; i < mCorners.size(); ++i) {
+    mCorners[i] -= position;
+  } */
+}
+
 
 void Polygon::calculateNormals() {
   mNormals.reserve(mCorners.size()); // Pre-allocate space
@@ -37,16 +73,40 @@ void Polygon::calculateNormals() {
   }
 }
 
-/* 
-Modidy so the render function renders the polygon
-using the center (position) as the reference point. 
+void Polygon::Scale(float factor) {
+  for (size_t i = 0; i < mCorners.size(); ++i) {
+    mCorners[i] = position + factor * (mCorners[i] - position);
+  }
+}
 
-Because all the pyhsics calculations modify the position of the polygon. 
+void Polygon::Rotate(float angle) {
+  float s = std::sin(angle);
+  float c = std::cos(angle);
+  rotation += angle;
+  for (size_t i = 0; i < mCorners.size(); ++i) {
+    sf::Vector2f p = mCorners[i] - position;
+    mCorners[i].x = p.x * c - p.y * s + position.x;
+    mCorners[i].y = p.x * s + p.y * c + position.y;
+  }
+}
 
-Maybe i can save the prevouis position and the actual. So the pyhsics calculations
-modify the actual position. And when i render i calculate the transaltion made 
-from old_position to actuil_position. And that same translation is applied to the corners.
- */
+void Polygon::setPosition(sf::Vector2f pos) {
+  sf::Vector2f translation = pos - position;
+  for (size_t i = 0; i < mCorners.size(); ++i) {
+    mCorners[i] += translation;
+  }
+  position = pos;
+}
+
+void Polygon::setColor(sf::Color _color) {
+  mColor = _color;
+}
+
+
+Shape::type Polygon::getType() {
+  return sPolygon;
+}
+
 void Polygon::render(sf::RenderWindow& window) {
   sf::ConvexShape shape;
   shape.setPointCount(mCorners.size());
@@ -66,25 +126,4 @@ void Polygon::renderNormals(sf::RenderWindow& window) {
     normalLine[1].color = sf::Color::Red; // Set normal line end color (red)
     window.draw(normalLine);
   }
-}
-
-void Polygon::Translate(sf::Vector2f tvector){
-  mCenter += tvector;
-  for (size_t i = 0; i < mCorners.size(); ++i) {
-    mCorners[i] += tvector;
-  }
-}
-
-void Polygon::setColor(sf::Color _color) {
-  mColor = _color;
-}
-
-void Polygon::Scale(float factor) {
-  for (size_t i = 0; i < mCorners.size(); ++i) {
-    mCorners[i] = mCenter + factor * (mCorners[i] - mCenter);
-  }
-}
-
-Shape::type Polygon::getType() {
-  return sPolygon;
 }

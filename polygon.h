@@ -30,16 +30,21 @@ public:
     
     // Constructor
     Polygon(const std::vector<sf::Vector2f>& _corners, 
-            sf::Color _color = sf::Color::White);
+            sf::Color _color = sf::Color::White,
+            Material _material = mat_rock,
+            float _rotation = 0.0f);
     
     // Destructor (optional, compiler usually generates default)
     ~Polygon() = default;   
     
-    // Translate the polygon
-    void Translate(sf::Vector2f tvector);
-    
     // Scale the polygon
     void Scale(float factor);
+
+    // Rotate the polygon
+    void Rotate(float angle);
+
+    // Set position of the polygon
+    void setPosition(sf::Vector2f _position);
 
     // override the render function of shape
     void render(sf::RenderWindow& window);
@@ -56,6 +61,9 @@ public:
 private:
     // Function to calculate normals 
     void calculateNormals();
+
+    // Function to calculate the center of the polygon
+    void calculateCentroid(); // the centroid will be the position of the polygon.
 };
 
 #endif

@@ -27,7 +27,6 @@ const Material mat_superBall = {0.3f, 0.95f};
 const Material mat_pillow = {0.1f, 0.2f};
 const Material mat_static = {0.0f, 0.4f};
 
-const
 class Shape {
     // virtual funciton that returns the type of the shape
     public:
@@ -36,12 +35,11 @@ class Shape {
         sPolygon
     };
 
-    sf::Vector2f old_position; // used to facilitate the rendering of the shape
     sf::Vector2f position; // center
     sf::Vector2f velocity;
 
     float rotation; // radians
-    sf::Vector2f angularVelocity; // velocity of rotation
+    float angularVelocity; // velocity of rotation
 
     sf::Vector2f force; // accomulated forces
     float torque; // torque applied to the shape
@@ -57,9 +55,26 @@ class Shape {
     // color of the polygon
     sf::Color mColor;
 
+
+    virtual ~Shape() = default;
+
+    // Scale the shape
+    virtual void Scale(float factor) = 0;
+
+    // Rotate the shape
+    virtual void Rotate(float angle) = 0;
+
+    // Set position of the shape
+    virtual void setPosition(sf::Vector2f _position) = 0;
+
+    virtual void render(sf::RenderWindow& window) = 0;
+
+    virtual void computeMass() = 0;
+
+    // change color
+    virtual void setColor(sf::Color _color) = 0;
+
     virtual type getType() = 0;
-
-
 };
 
 

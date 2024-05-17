@@ -37,6 +37,16 @@ void Polygon::calculateNormals() {
   }
 }
 
+/* 
+Modidy so the render function renders the polygon
+using the center (position) as the reference point. 
+
+Because all the pyhsics calculations modify the position of the polygon. 
+
+Maybe i can save the prevouis position and the actual. So the pyhsics calculations
+modify the actual position. And when i render i calculate the transaltion made 
+from old_position to actuil_position. And that same translation is applied to the corners.
+ */
 void Polygon::render(sf::RenderWindow& window) {
   sf::ConvexShape shape;
   shape.setPointCount(mCorners.size());

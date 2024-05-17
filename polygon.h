@@ -18,16 +18,7 @@ for now it just stores:
 #include <iostream>
 #include <vector>
 #include <cmath>
-
-class Shape {
-    // virtual funciton that returns the type of the shape
-    public:
-    enum type {
-        sCircle,
-        sPolygon
-    };
-    virtual type getType() = 0;
-};
+#include "shape.h"
 
 class Polygon : public Shape{
 public: 
@@ -36,12 +27,6 @@ public:
 
     // normals of the polygon
     std::vector<sf::Vector2f> mNormals;
-
-    // center of the polygon
-    sf::Vector2f mCenter;
-
-    // color of the polygon
-    sf::Color mColor;
     
     // Constructor
     Polygon(const std::vector<sf::Vector2f>& _corners, 

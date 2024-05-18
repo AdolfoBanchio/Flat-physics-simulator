@@ -10,26 +10,42 @@ I will use SFML library to draw the shapes and simulate the physics.
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
 #include "polygon.h"
 #include "collision.h"
  const float PI = 3.14159265358979323846f;
 
-std::vector<sf::Vector2f> createRegularPentagon(float sideLength, sf::Vector2f center) {
+std::vector<sf::Vector2f> createRegularPentagon(float sideLength,sf::Vector2f c) {
     std::vector<sf::Vector2f> vertices;
     float R = sideLength / (2 * sin(PI / 5)); // Radius of the circumscribed circle
 
     for (int i = 0; i < 5; ++i) {
         float theta = 2 * PI * i / 5;
-        float x = R * cos(theta) + center.x;
-        float y = R * sin(theta) + center.y;
+        float x = R * cos(theta) + c.x;
+        float y = R * sin(theta) + c.y ;
+        // variate the y axis with a random number beewten 100 and 200
+        //y += rand() % 200 + 200;
+        //x += rand() % 200 + 200;
         vertices.push_back(sf::Vector2f(x, y));
     }
-
     return vertices;
 }
 // First star creating the main function and creating some windows and shapes
-std::vector<sf::Vector2f> corners = createRegularPentagon(1 * 37.7953f, sf::Vector2f(50, 50));
-Polygon polygon(corners, sf::Color::Red, mat_rock);
+
+// square of 5cm x 5cm corners
+std::vector<sf::Vector2f> squareCorners = {
+    sf::Vector2f(300, 300),
+    sf::Vector2f(400, 300),
+    sf::Vector2f(400, 400),
+    sf::Vector2f(300, 400)
+};
+
+// create a polygon with random values of its corner in the ranges of 200 to 500. 
+
+sf::Vector2f center = sf::Vector2f(200, 200);
+std::vector<sf::Vector2f> randomCorners = createRegularPentagon(50, center);
+
+Polygon polygon3(randomCorners, sf::Color::Red, mat_rock);
 
 // create a triangle
 std::vector<sf::Vector2f> corners2 = {
@@ -39,6 +55,16 @@ std::vector<sf::Vector2f> corners2 = {
 };
 Polygon polygon2(corners2, sf::Color::Green);
 
+// create a star polygon
+std::vector<sf::Vector2f> corners3 = {
+    sf::Vector2f(400, 400),
+    sf::Vector2f(500, 300),
+    sf::Vector2f(450, 500),
+    sf::Vector2f(400, 450),
+    sf::Vector2f(350, 500)
+};
+
+Polygon polygon(corners3, sf::Color::Green);
 
 //create a Mainfold with the shapes
 Mainfold coll = Mainfold(&polygon, &polygon2);
@@ -49,6 +75,7 @@ sf::Time dtTime = sf::seconds(dt);
 sf::Time accumulatorTime = sf::seconds(0.0f);
 
 float factor = 1.01;
+
 void updatePositions(Mainfold&coll,sf::RenderWindow& window){
     
     Polygon *polygon = dynamic_cast<Polygon*>(coll.shapeA);
@@ -77,10 +104,14 @@ void updatePositions(Mainfold&coll,sf::RenderWindow& window){
             factor += 0.01;
             polygon2->Rotate(0.01);
             
-            sf::Vector2f newpos = polygon->position + sf::Vector2f(1, 1); 
-            polygon->Rotate(0.01);
-            polygon->setPosition(newpos);
+            sf::Vector2f newpos = polygon3.position + sf::Vector2f(1, 1); 
+            polygon3.Rotate(0.01);
+            polygon3.setPosition(newpos);
+
+            sf::Vector2f newpos2 = polygon->position + sf::Vector2f(-0.3, -1);
+            polygon->setPosition(newpos2);
         }
+        //polygon3.Rotate(0.01);
 }
 
 
@@ -131,10 +162,13 @@ int main()
 
         polygon2.render(window);
 
+        polygon3.render(window);
         // render the normals of the polygon
         polygon.renderNormals(window);
 
         polygon2.renderNormals(window);
+
+        polygon3.renderNormals(window);
 
         PolyvsPoly(polygon, polygon2, coll);
 

@@ -36,28 +36,40 @@ void Polygon::computeMass() {
   float signedArea = 0.0f;
   inertia = 0.0f;
 
+  float Ix = 0.0f;
+  float Iy = 0.0f;
   // calculate the signed area, center and inertia
   for (size_t i = 0; i < mCorners.size(); ++i) {
     sf::Vector2f current = mCorners[i];
     sf::Vector2f next = mCorners[(i + 1) % mCorners.size()];
  
     float crossProduct = current.x * next.y - next.x * current.y;
+    // print the vectors and the cross product
+    /* std::cout << "Current: " << current.x << " " << current.y << "\n";
+    std::cout << "Next: " << next.x << " " << next.y << "\n";
+    std::cout << "Cross Product: " << crossProduct << "\n"; */
     signedArea += crossProduct;
     position += (current + next) * crossProduct;
 
     float x2 = current.x * current.x + next.x * current.x + next.x * next.x;
     float y2 = current.y * current.y + next.y * current.y + next.y * next.y;
-    inertia = crossProduct * (x2 + y2);
+    Ix += x2 * crossProduct;
+    Iy += y2 * crossProduct;
   }
-  signedArea *= 0.5f;
+
+  signedArea = signedArea*0.5f;
   position /= (6.0f * signedArea);
 
+  std::cout << "Position: " << position.x << " " << position.y << "\n";
   // calculate the mass
-  mass = material.density * signedArea;
+  mass = material.density * std::abs(signedArea);
   inv_mass = (mass) ? 1.0f / mass : 0.0f;
 
   // calculate the inertia
-  inertia = std::abs(inertia) / (6.0f * signedArea);  
+  Ix /= 12.0f;
+  Iy /= 12.0f;
+  
+  inertia =  std::abs(Ix + Iy) ;//- mass * (position.x * position.x + position.y * position.y); substracting m * d^2 moves the inertia momentum to the center.
   inv_inertia = (inertia) ? 1.0f / inertia : 0.0f;
 
   std::cout << "Area: " << signedArea << "\n";

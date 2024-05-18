@@ -19,7 +19,7 @@ struct Material {
     //float friction;
 };
 // Define some common materials as constants of the file
-const Material mat_rock = {0.6f, 0.1f};
+const Material mat_rock = {1.0f, 0.1f};
 const Material mat_wood = {0.3f, 0.2f};
 const Material mat_metal = {1.2f, 0.05f};
 const Material mat_bouncyBall = {0.3f, 0.8f};

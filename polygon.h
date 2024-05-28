@@ -49,6 +49,7 @@ public:
     void computeMass();
 
     void render(sf::RenderWindow& window);
+    
     void renderNormals(sf::RenderWindow& window);
 
     void setColor(sf::Color _color);

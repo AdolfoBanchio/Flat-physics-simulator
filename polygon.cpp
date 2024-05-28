@@ -60,7 +60,7 @@ void Polygon::computeMass() {
   signedArea = signedArea*0.5f;
   position /= (6.0f * signedArea);
 
-  std::cout << "Position: " << position.x << " " << position.y << "\n";
+  // std::cout << "Position: " << position.x << " " << position.y << "\n";
   // calculate the mass
   mass = material.density * std::abs(signedArea);
   inv_mass = (mass) ? 1.0f / mass : 0.0f;
@@ -69,12 +69,14 @@ void Polygon::computeMass() {
   Ix /= 12.0f;
   Iy /= 12.0f;
   
-  inertia =  std::abs(Ix + Iy) ;//- mass * (position.x * position.x + position.y * position.y); substracting m * d^2 moves the inertia momentum to the center.
+  inertia =  std::abs(Ix + Iy) ;//- mass * (position.x * position.x + position.y * position.y); substracting m * d^2 moves the inertia momentum to  the center.
   inv_inertia = (inertia) ? 1.0f / inertia : 0.0f;
-
+  
+  /* 
   std::cout << "Area: " << signedArea << "\n";
   std::cout << "Mass: " << mass << "\n";
-  std::cout << "Inertia: " << inertia << "\n";
+  std::cout << "Inertia: " << inertia << "\n"; 
+  */
 }
 
 
@@ -139,7 +141,13 @@ void Polygon::render(sf::RenderWindow& window) {
     shape.setPoint(i, mCorners[i]);
   }
   shape.setFillColor(mColor);
+  // draw a dot in the centroid (position) of the polygon
+  sf::CircleShape center;
+  center.setRadius(2.0f);
+  center.setPosition(position);
+  center.setFillColor(sf::Color::Black);
   window.draw(shape);
+  window.draw(center);
 }
 
 void Polygon::renderNormals(sf::RenderWindow& window) {
